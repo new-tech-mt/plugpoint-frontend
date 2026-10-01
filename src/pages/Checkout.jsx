@@ -228,40 +228,58 @@ function Checkout({
     );
   };
 
-  const buildWhatsAppMessage = (
-    order
-  ) => {
-    const productLines =
-      cart
-        .map(
-          (item) =>
-            `• ${item.name} × ${item.quantity} — Rs. ${(
-              Number(item.price || 0) *
-              Number(item.quantity || 0)
-            ).toLocaleString("en-PK")}`
-        )
-        .join("\n");
+  /*
+   * Professional WhatsApp order message
+   */
+  const buildWhatsAppMessage = (order) => {
+    const productLines = cart
+      .map((item, index) => {
+        const itemPrice =
+          Number(item.price || 0);
+
+        const itemQuantity =
+          Number(item.quantity || 0);
+
+        const itemTotal =
+          itemPrice * itemQuantity;
+
+        return [
+          `${index + 1}. ${item.name}`,
+          `   Qty: ${itemQuantity}`,
+          `   Price: Rs. ${itemPrice.toLocaleString(
+            "en-PK"
+          )}`,
+          `   Subtotal: Rs. ${itemTotal.toLocaleString(
+            "en-PK"
+          )}`,
+        ].join("\n");
+      })
+      .join("\n\n");
 
     return [
-      "Hello PlugPoint!",
+      "🛒 *NEW ORDER - PLUGPOINT*",
       "",
-      `Order ID: ${order._id}`,
+      `📋 *Order ID:* ${order._id}`,
       "",
-      "Customer Details:",
+      "👤 *CUSTOMER DETAILS*",
       `Name: ${form.name}`,
       `Phone: ${form.phone}`,
       `Address: ${form.address}`,
       `City: ${form.city}`,
       "",
-      "Order Items:",
+      "📦 *ORDER DETAILS*",
       productLines,
       "",
-      `Total: Rs. ${subtotal.toLocaleString(
+      "💰 *ORDER TOTAL*",
+      `Total: *Rs. ${subtotal.toLocaleString(
         "en-PK"
-      )}`,
-      `Payment Method: ${selectedPayment}`,
+      )}*`,
       "",
-      "Please confirm my order.",
+      `💳 *Payment Method:* ${selectedPayment}`,
+      "",
+      "✅ Please confirm my order.",
+      "",
+      "Thank you! ❤️",
     ].join("\n");
   };
 
@@ -958,4 +976,3 @@ function Checkout({
 }
 
 export default Checkout;
-
