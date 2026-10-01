@@ -70,6 +70,23 @@ function Checkout({
   const [success, setSuccess] =
     useState(null);
 
+  /*
+    IMPORTANT:
+    Keep a copy of the cart before
+    App.jsx clears the original cart.
+  */
+  const [orderedItems, setOrderedItems] =
+    useState([]);
+
+  const [orderedTotal, setOrderedTotal] =
+    useState(0);
+
+  const [orderedCustomer, setOrderedCustomer] =
+    useState(null);
+
+  const [orderedPayment, setOrderedPayment] =
+    useState("");
+
   useEffect(() => {
     const fetchSettings = async () => {
       try {
@@ -229,24 +246,45 @@ function Checkout({
   };
 
   /*
-   * Professional WhatsApp order message
-   */
-  const buildWhatsAppMessage = (order) => {
-    const productLines = cart
-      .map((item, index) => {
-        const itemPrice =
-          Number(item.price || 0);
+    BUILD PROFESSIONAL WHATSAPP MESSAGE
+  */
+  const buildWhatsAppMessage = (
+    order
+  ) => {
+    const items =
+      orderedItems.length > 0
+        ? orderedItems
+        : order.items || [];
 
-        const itemQuantity =
-          Number(item.quantity || 0);
+    const productLines = items
+      .map((item, index) => {
+        const product =
+          item.product || item;
+
+        const name =
+          product.name ||
+          item.name ||
+          "Product";
+
+        const price =
+          Number(
+            product.price ??
+              item.price ??
+              0
+          );
+
+        const quantity =
+          Number(
+            item.quantity || 1
+          );
 
         const itemTotal =
-          itemPrice * itemQuantity;
+          price * quantity;
 
         return [
-          `${index + 1}. ${item.name}`,
-          `   Qty: ${itemQuantity}`,
-          `   Price: Rs. ${itemPrice.toLocaleString(
+          `${index + 1}. ${name}`,
+          `   Qty: ${quantity}`,
+          `   Price: Rs. ${price.toLocaleString(
             "en-PK"
           )}`,
           `   Subtotal: Rs. ${itemTotal.toLocaleString(
@@ -256,28 +294,43 @@ function Checkout({
       })
       .join("\n\n");
 
+    const total =
+      Number(
+        order.totalAmount ??
+          orderedTotal ??
+          0
+      );
+
+    const customer =
+      orderedCustomer || form;
+
+    const paymentMethod =
+      orderedPayment ||
+      order.paymentMethod ||
+      selectedPayment;
+
     return [
       "🛒 *NEW ORDER - PLUGPOINT*",
       "",
       `📋 *Order ID:* ${order._id}`,
       "",
       "👤 *CUSTOMER DETAILS*",
-      `Name: ${form.name}`,
-      `Phone: ${form.phone}`,
-      `Address: ${form.address}`,
-      `City: ${form.city}`,
+      `Name: ${customer.name}`,
+      `Phone: ${customer.phone}`,
+      `Address: ${customer.address}`,
+      `City: ${customer.city}`,
       "",
       "📦 *ORDER DETAILS*",
-      productLines,
+      productLines || "No products found.",
       "",
       "💰 *ORDER TOTAL*",
-      `Total: *Rs. ${subtotal.toLocaleString(
+      `Total: *Rs. ${total.toLocaleString(
         "en-PK"
       )}*`,
       "",
-      `💳 *Payment Method:* ${selectedPayment}`,
+      `💳 *Payment Method:* ${paymentMethod}`,
       "",
-      "✅ Please confirm my order.",
+      "✅ *Please confirm my order.*",
       "",
       "Thank you! ❤️",
     ].join("\n");
@@ -314,6 +367,33 @@ function Checkout({
     try {
       setSubmitting(true);
 
+      /*
+        Save everything BEFORE App.jsx clears
+        the cart.
+      */
+      const cartSnapshot =
+        cart.map((item) => ({
+          ...item,
+          quantity:
+            Number(item.quantity || 0),
+        }));
+
+      const customerSnapshot = {
+        ...form,
+      };
+
+      const paymentSnapshot =
+        selectedPayment;
+
+      const totalSnapshot =
+        cartSnapshot.reduce(
+          (total, item) =>
+            total +
+            Number(item.price || 0) *
+              Number(item.quantity || 0),
+          0
+        );
+
       const response =
         await fetch(API_URL, {
           method: "POST",
@@ -324,9 +404,10 @@ function Checkout({
           },
 
           body: JSON.stringify({
-            customer: form,
+            customer:
+              customerSnapshot,
 
-            items: cart.map(
+            items: cartSnapshot.map(
               (item) => ({
                 product:
                   item._id,
@@ -336,7 +417,7 @@ function Checkout({
             ),
 
             paymentMethod:
-              selectedPayment,
+              paymentSnapshot,
           }),
         });
 
@@ -350,8 +431,30 @@ function Checkout({
         );
       }
 
+      /*
+        Store snapshots for WhatsApp.
+      */
+      setOrderedItems(
+        cartSnapshot
+      );
+
+      setOrderedCustomer(
+        customerSnapshot
+      );
+
+      setOrderedPayment(
+        paymentSnapshot
+      );
+
+      setOrderedTotal(
+        totalSnapshot
+      );
+
       setSuccess(data.order);
 
+      /*
+        Now it is safe to clear the cart.
+      */
       if (onOrderPlaced) {
         onOrderPlaced();
       }
@@ -443,7 +546,9 @@ function Checkout({
               <strong>
                 Rs.{" "}
                 {Number(
-                  success.totalAmount || 0
+                  success.totalAmount ||
+                    orderedTotal ||
+                    0
                 ).toLocaleString(
                   "en-PK"
                 )}
