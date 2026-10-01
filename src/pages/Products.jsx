@@ -9,7 +9,7 @@ import {
 import ProductCard from "../components/ProductCard";
 
 const API_URL =
-  "${import.meta.env.VITE_API_URL}/api/products";
+  `${import.meta.env.VITE_API_URL}/api/products`;
 
 function Products({
   onAddToCart,
@@ -454,3 +454,4 @@ function Products({
 }
 
 export default Products;
+

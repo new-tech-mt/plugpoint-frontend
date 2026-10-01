@@ -11,10 +11,10 @@ import {
 import { Link } from "react-router-dom";
 
 const API_URL =
-  "${import.meta.env.VITE_API_URL}/api/orders";
+  `${import.meta.env.VITE_API_URL}/api/orders`;
 
 const SETTINGS_URL =
-  "${import.meta.env.VITE_API_URL}/api/settings";
+  `${import.meta.env.VITE_API_URL}/api/settings`;
 
 const DEFAULT_WHATSAPP =
   "923213359177";
@@ -958,3 +958,4 @@ function Checkout({
 }
 
 export default Checkout;
+

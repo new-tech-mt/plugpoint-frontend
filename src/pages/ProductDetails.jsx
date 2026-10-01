@@ -12,10 +12,10 @@ import {
 } from "lucide-react";
 
 const API_URL =
-  "${import.meta.env.VITE_API_URL}/api/products";
+  `${import.meta.env.VITE_API_URL}/api/products`;
 
 const SETTINGS_URL =
-  "${import.meta.env.VITE_API_URL}/api/settings";
+  `${import.meta.env.VITE_API_URL}/api/settings`;
 
 function ProductDetails({
   onAddToCart,
@@ -520,3 +520,4 @@ function ProductDetails({
 }
 
 export default ProductDetails;
+

@@ -16,10 +16,10 @@ import { Link } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 
 const API_URL =
-  "${import.meta.env.VITE_API_URL}/api/products";
+  `${import.meta.env.VITE_API_URL}/api/products`;
 
 const SETTINGS_URL =
-  "${import.meta.env.VITE_API_URL}/api/settings";
+  `${import.meta.env.VITE_API_URL}/api/settings`;
 
 const categories = [
   {
@@ -786,3 +786,4 @@ function Home({
 }
 
 export default Home;
+

@@ -40,3 +40,4 @@ function CategoryCard({ category }) {
 
 export default CategoryCard;
 
+

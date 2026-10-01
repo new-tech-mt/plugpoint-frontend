@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 
 const SETTINGS_URL =
-  "${import.meta.env.VITE_API_URL}/api/settings";
+  `${import.meta.env.VITE_API_URL}/api/settings`;
 
 function Navbar({ cartCount = 0 }) {
   const [mobileOpen, setMobileOpen] =
@@ -209,3 +209,4 @@ function Navbar({ cartCount = 0 }) {
 }
 
 export default Navbar;
+
